@@ -151,7 +151,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
   - and verify that events/properties reach the expected node/target with correct values.
 
 **Status**
-- TODO: current implementation only handles key events and primary mouse down/up/move; full gesture coverage is design‑only.
+- DONE (FountainGUIKit layer): `FGKEvent` and `FGKRootView` map drag, scroll, magnify, rotate, and swipe events into typed FGK events and route them through the node graph. Recommended gesture→property semantics are documented in `AGENTS.md`; downstream MRTS/PB‑VRT usage will be handled from consumers in FountainKit.
 
 ## Gap tracking
 
@@ -172,7 +172,7 @@ Use this section as a quick checklist when starting a new implementation session
 - [ ] M5 docs and API surface stabilised.
 - [ ] M6 local FountainGUIKit tests cover event routing and layout.
 - [ ] M6 at least one MRTS/PB‑VRT scenario uses a FountainGUIKit surface as the render host.
-- [ ] M7 full gesture/pointer support implemented (AppKit → FGK mapping).
-- [ ] M7 gesture behaviour documented and covered by tests.
+- [x] M7 full gesture/pointer support implemented (AppKit → FGK mapping).
+- [x] M7 gesture behaviour documented and covered by tests.
 
 When any item flips from unchecked to checked, update both this file and the relevant sections in `AGENTS.md`.

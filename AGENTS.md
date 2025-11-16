@@ -26,8 +26,14 @@ Gestures (trackpad/mouse) are first‑class citizens in this model. The long‑t
 Public surface (initial draft, kept tiny and stable):
 
 - `FGKEvent`, `FGKKeyEvent`, `FGKMouseEvent`
-  - Canonical event types for keyboard and mouse input.
+  - Canonical event types for keyboard, mouse, and gestures.
   - Map 1:1 from `NSEvent` in `FGKRootView`, but are decoupled so tests can construct them directly.
+  - Gesture cases:
+    - `.mouseDragged(FGKMouseEvent)` — pointer drag after a mouse down.
+    - `.scroll(FGKScrollEvent)` — trackpad/mouse wheel scroll with high‑resolution deltas.
+    - `.magnify(FGKMagnifyEvent)` — pinch/zoom gestures with a magnification factor.
+    - `.rotate(FGKRotateEvent)` — rotation gestures with a rotation delta.
+    - `.swipe(FGKSwipeEvent)` — swipe gestures with directional deltas (for example two‑finger left/right).
 - `FGKEventTarget`
   - Protocol for anything that wants to receive events: `func handle(event: FGKEvent) -> Bool`.
   - Used by nodes to implement a Cocoa‑style responder chain without touching `NSResponder`.
@@ -41,6 +47,12 @@ Public surface (initial draft, kept tiny and stable):
   - The only AppKit entry point.
   - Owns a `rootNode: FGKNode` and forwards `keyDown`, `keyUp`, `mouseDown`, `mouseUp`, `mouseMoved` as `FGKEvent` into the node graph.
   - For pointer events, uses `rootNode.hitTest(_:)` to choose an initial target node before bubbling; if no node claims the point, events bubble from `rootNode`.
+  - Overrides gesture‑related NSView methods and maps them into FGK events:
+    - `mouseDragged`, `rightMouseDragged`, `otherMouseDragged` → `.mouseDragged`.
+    - `scrollWheel` → `.scroll`.
+    - `magnify(with:)` → `.magnify`.
+    - `rotate(with:)` → `.rotate`.
+    - `swipe(with:)` → `.swipe`.
   - Always accepts first responder; apps control focus and wiring by choosing which node’s target consumes events.
 
 Future layers (to be designed here before code is added):
@@ -52,6 +64,45 @@ Future layers (to be designed here before code is added):
     - `FGKInstrumentAdapter` — an `FGKEventTarget` that forwards FGK events to an instrument sink using well‑known topics (for example `fgk.keyDown`, `fgk.mouseDown`) and typed payloads (`FGKKeyEvent`, `FGKMouseEvent`).
     - `FGKNode.attachInstrument(sink:)` — convenience to attach an adapter as a node’s target.
   - Optional MIDI 2.0 adapter that exposes a node’s properties via CI/PE and consumes UMP from loopback/RTP transports.
+
+## Gesture semantics and recommended mappings
+
+FountainGUIKit’s job is to expose gestures as **typed events** and let host apps decide how to interpret them. To keep user expectations aligned across apps (PatchBay, Composer Studio, and future tools), we recommend the following defaults for canvas‑like surfaces:
+
+- **Canvas pan (2D surfaces)**
+  - Horizontal scroll (`FGKScrollEvent.deltaX`) → `canvas.translation.x` property.
+  - Vertical scroll (`FGKScrollEvent.deltaY`) → `canvas.translation.y` property.
+  - Use the host platform’s natural scrolling conventions: on macOS, treat positive `deltaY` as content moving up (canvas translating down) and vice versa.
+
+- **Canvas zoom**
+  - Pinch/zoom (`FGKMagnifyEvent.magnification`) → `canvas.zoom` property.
+  - Positive magnification should increase zoom (zoom in), negative should decrease (zoom out).
+  - Anchor zoom around the pointer location when possible (the point under the cursor stays as stable as feasible).
+
+- **Drag‑to‑pan**
+  - `.mouseDragged` on a canvas node can be interpreted as a pan gesture:
+    - Convert drag deltas to `canvas.translation.x/y` updates.
+    - Coordinate this with scroll behaviour so users can pan either via drag or scroll, depending on app affordances.
+
+- **Rotation**
+  - `FGKRotateEvent.rotation` can drive a rotation property (for example `canvas.rotation` or an instrument‑specific rotation field).
+  - For surfaces where rotation is not meaningful, treat the event as no‑op or repurpose it for an instrument‑specific control (for example timeline scrub, depending on the property schema).
+
+- **Swipes (navigation)**
+  - Horizontal swipes (`FGKSwipeEvent.deltaX`) are ideal for discrete navigation:
+    - For example previous/next page, scene, section, or cue.
+    - Map to an app‑specific property such as `scene.index`, `page`, or a navigation command in the host app.
+  - Vertical swipes can be reserved for advanced behaviours or left unhandled if scroll already covers the main use‑case.
+
+These mappings are **recommendations**, not hard rules. FountainGUIKit only:
+
+- emits the typed events (FGK*Event structs), and
+- provides `FGKNode.setProperty(_ name:value:)` to apply property changes to interested targets.
+
+Host apps are responsible for:
+
+- declaring their property schema via `FGKPropertyDescriptor` (for example including `canvas.zoom`, `canvas.translation.x`, `canvas.translation.y`), and
+- deciding which nodes should translate gestures into which properties, so that behaviour remains consistent with their UI/Teatro prompts and MRTS expectations.
 
 ## Testing, MRTS, and PB‑VRT
 
