@@ -2,7 +2,7 @@
 
 FountainGUIKit is a small, NSView‑only GUI framework designed to host MetalViewKit renderers and MIDI 2.0 “instruments” without depending on SwiftUI or AppKit’s responder chain. It provides a custom event model, a pure‑Swift node graph, and a single root NSView that you can embed into existing macOS apps.
 
-This repository follows an **agent‑driven design**: `AGENTS.md` is the primary design narrative, and `PLAN.md` tracks milestones and Definition of Done. The conceptual foundations are described in the internal whitepaper `Building a Custom GUI Framework with MetalViewKit and MIDI2 Integration.pdf` (on your Desktop), which explains why we want predictable, MIDI‑friendly UI surfaces.
+This repository follows an **agent‑driven design**: `AGENTS.md` is the primary design narrative, and `PLAN.md` tracks milestones and Definition of Done. The conceptual foundations are described in the design note `Doc/Building-a-Custom-GUI-Framework-with-MetalViewKit-and-MIDI2-Integration.md`, which explains why we want predictable, MIDI‑friendly UI surfaces.
 
 ## What FountainGUIKit Provides
 
@@ -40,8 +40,8 @@ FountainGUIKit is shaped by three main sources:
   - M4: MIDI 2.0 CI/PE integration.
   - M5: consumers and documentation.
   - M6: testing, MRTS, and PB‑VRT integration.
-- `Building a Custom GUI Framework with MetalViewKit and MIDI2 Integration.pdf`
-  - A design note that motivates the framework:
+- `Doc/Building-a-Custom-GUI-Framework-with-MetalViewKit-and-MIDI2-Integration.md`
+  - A design note (transcribed from the original PDF) that motivates the framework:
     - treat every interactive element as a MIDI 2.0 instrument,
     - replace “mystery” responder chains with explicit, testable event flows,
     - and make UI behaviour controllable via MIDI messages and property changes.
@@ -125,4 +125,3 @@ The framework is designed to integrate with FountainKit’s test infrastructure:
 - Keep AGENTS, PLAN, and README in sync when you modify the public surface.
 
 FountainGUIKit is intentionally small and focused: its job is to make MetalViewKit and MIDI 2.0 easier to use in deterministic, testable GUIs, not to replace full UI frameworks. Design first in AGENTS, plan in PLAN, then implement. 
-
