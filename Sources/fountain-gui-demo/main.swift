@@ -14,6 +14,16 @@ private final class DemoTarget: FGKEventTarget {
             fputs("[FGKDemo] mouseUp at=\(mouse.locationInView)\n", stderr)
         case .mouseMoved(let mouse):
             fputs("[FGKDemo] mouseMoved at=\(mouse.locationInView)\n", stderr)
+        case .mouseDragged(let mouse):
+            fputs("[FGKDemo] mouseDragged at=\(mouse.locationInView)\n", stderr)
+        case .scroll(let scroll):
+            fputs("[FGKDemo] scroll dx=\(scroll.deltaX) dy=\(scroll.deltaY) at=\(scroll.locationInView)\n", stderr)
+        case .magnify(let magnify):
+            fputs("[FGKDemo] magnify m=\(magnify.magnification) at=\(magnify.locationInView)\n", stderr)
+        case .rotate(let rotate):
+            fputs("[FGKDemo] rotate r=\(rotate.rotation) at=\(rotate.locationInView)\n", stderr)
+        case .swipe(let swipe):
+            fputs("[FGKDemo] swipe dx=\(swipe.deltaX) dy=\(swipe.deltaY) at=\(swipe.locationInView)\n", stderr)
         }
         return true
     }

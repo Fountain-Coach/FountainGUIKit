@@ -7,6 +7,11 @@ public enum FGKEvent {
     case mouseDown(FGKMouseEvent)
     case mouseUp(FGKMouseEvent)
     case mouseMoved(FGKMouseEvent)
+    case mouseDragged(FGKMouseEvent)
+    case scroll(FGKScrollEvent)
+    case magnify(FGKMagnifyEvent)
+    case rotate(FGKRotateEvent)
+    case swipe(FGKSwipeEvent)
 }
 
 public struct FGKKeyEvent {
@@ -75,6 +80,62 @@ public protocol FGKPropertyConsumer: AnyObject {
 /// MetalViewKit directly.
 public protocol FGKInstrumentSink: AnyObject {
     func vendorEvent(topic: String, data: Any?)
+}
+
+/// Scroll wheel event payload.
+public struct FGKScrollEvent {
+    public let locationInView: NSPoint
+    public let deltaX: Double
+    public let deltaY: Double
+    public let modifiers: NSEvent.ModifierFlags
+
+    public init(locationInView: NSPoint, deltaX: Double, deltaY: Double, modifiers: NSEvent.ModifierFlags) {
+        self.locationInView = locationInView
+        self.deltaX = deltaX
+        self.deltaY = deltaY
+        self.modifiers = modifiers
+    }
+}
+
+/// Magnify (pinch/zoom) gesture payload.
+public struct FGKMagnifyEvent {
+    public let locationInView: NSPoint
+    public let magnification: Double
+    public let modifiers: NSEvent.ModifierFlags
+
+    public init(locationInView: NSPoint, magnification: Double, modifiers: NSEvent.ModifierFlags) {
+        self.locationInView = locationInView
+        self.magnification = magnification
+        self.modifiers = modifiers
+    }
+}
+
+/// Rotation gesture payload.
+public struct FGKRotateEvent {
+    public let locationInView: NSPoint
+    public let rotation: Double
+    public let modifiers: NSEvent.ModifierFlags
+
+    public init(locationInView: NSPoint, rotation: Double, modifiers: NSEvent.ModifierFlags) {
+        self.locationInView = locationInView
+        self.rotation = rotation
+        self.modifiers = modifiers
+    }
+}
+
+/// Swipe gesture payload.
+public struct FGKSwipeEvent {
+    public let locationInView: NSPoint
+    public let deltaX: Double
+    public let deltaY: Double
+    public let modifiers: NSEvent.ModifierFlags
+
+    public init(locationInView: NSPoint, deltaX: Double, deltaY: Double, modifiers: NSEvent.ModifierFlags) {
+        self.locationInView = locationInView
+        self.deltaX = deltaX
+        self.deltaY = deltaY
+        self.modifiers = modifiers
+    }
 }
 
 /// Node in the FountainGUIKit view hierarchy.
@@ -183,6 +244,21 @@ public final class FGKInstrumentAdapter: FGKEventTarget {
         case .mouseMoved(let mouse):
             sink.vendorEvent(topic: "fgk.mouseMoved", data: mouse)
             return true
+        case .mouseDragged(let mouse):
+            sink.vendorEvent(topic: "fgk.mouseDragged", data: mouse)
+            return true
+        case .scroll(let scroll):
+            sink.vendorEvent(topic: "fgk.scroll", data: scroll)
+            return true
+        case .magnify(let magnify):
+            sink.vendorEvent(topic: "fgk.magnify", data: magnify)
+            return true
+        case .rotate(let rotate):
+            sink.vendorEvent(topic: "fgk.rotate", data: rotate)
+            return true
+        case .swipe(let swipe):
+            sink.vendorEvent(topic: "fgk.swipe", data: swipe)
+            return true
         }
     }
 }
@@ -276,5 +352,86 @@ open class FGKRootView: NSView {
         )
         let targetNode = rootNode.hitTest(p) ?? rootNode
         _ = targetNode.bubble(event: .mouseMoved(e))
+    }
+
+    open override func mouseDragged(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        let e = FGKMouseEvent(
+            locationInView: p,
+            buttonNumber: Int(event.buttonNumber),
+            modifiers: event.modifierFlags
+        )
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .mouseDragged(e))
+    }
+
+    open override func rightMouseDown(with event: NSEvent) {
+        mouseDown(with: event)
+    }
+
+    open override func rightMouseUp(with event: NSEvent) {
+        mouseUp(with: event)
+    }
+
+    open override func rightMouseDragged(with event: NSEvent) {
+        mouseDragged(with: event)
+    }
+
+    open override func otherMouseDown(with event: NSEvent) {
+        mouseDown(with: event)
+    }
+
+    open override func otherMouseUp(with event: NSEvent) {
+        mouseUp(with: event)
+    }
+
+    open override func otherMouseDragged(with event: NSEvent) {
+        mouseDragged(with: event)
+    }
+
+    open override func scrollWheel(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        let e = FGKScrollEvent(
+            locationInView: p,
+            deltaX: Double(event.scrollingDeltaX),
+            deltaY: Double(event.scrollingDeltaY),
+            modifiers: event.modifierFlags
+        )
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .scroll(e))
+    }
+
+    open override func magnify(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        let e = FGKMagnifyEvent(
+            locationInView: p,
+            magnification: Double(event.magnification),
+            modifiers: event.modifierFlags
+        )
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .magnify(e))
+    }
+
+    open override func rotate(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        let e = FGKRotateEvent(
+            locationInView: p,
+            rotation: Double(event.rotation),
+            modifiers: event.modifierFlags
+        )
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .rotate(e))
+    }
+
+    open override func swipe(with event: NSEvent) {
+        let p = convert(event.locationInWindow, from: nil)
+        let e = FGKSwipeEvent(
+            locationInView: p,
+            deltaX: Double(event.deltaX),
+            deltaY: Double(event.deltaY),
+            modifiers: event.modifierFlags
+        )
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .swipe(e))
     }
 }
