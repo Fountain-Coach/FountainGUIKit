@@ -39,6 +39,35 @@ public protocol FGKEventTarget: AnyObject {
     func handle(event: FGKEvent) -> Bool
 }
 
+/// Canonical value types for instrument properties.
+public enum FGKPropertyValue: Equatable {
+    case bool(Bool)
+    case int(Int)
+    case float(Double)
+}
+
+/// Descriptor for a single instrument property.
+public enum FGKPropertyKind: Equatable {
+    case bool(default: Bool)
+    case int(min: Int, max: Int, default: Int)
+    case float(min: Double, max: Double, default: Double)
+}
+
+public struct FGKPropertyDescriptor: Equatable {
+    public let name: String
+    public let kind: FGKPropertyKind
+
+    public init(name: String, kind: FGKPropertyKind) {
+        self.name = name
+        self.kind = kind
+    }
+}
+
+/// Target that can apply property changes by name.
+public protocol FGKPropertyConsumer: AnyObject {
+    func setProperty(_ name: String, value: FGKPropertyValue)
+}
+
 /// Minimal instrument sink interface compatible with MetalViewKit renderers.
 ///
 /// Types such as `MetalSceneRenderer` can conform to this protocol in consumers
@@ -59,14 +88,21 @@ public final class FGKNode {
     /// Optional frame for this node in the root view's coordinate space.
     public var frame: NSRect
 
+    /// Optional property schema for this node when it acts as an instrument.
+    public var properties: [FGKPropertyDescriptor]
+
     /// Optional instrument identity (e.g. MIDI 2.0 instrument id).
     public var instrumentId: String?
 
     /// Event sink for this node.
     public weak var target: FGKEventTarget?
 
-    public init(instrumentId: String? = nil, frame: NSRect = .zero, target: FGKEventTarget? = nil) {
+    public init(instrumentId: String? = nil,
+                frame: NSRect = .zero,
+                properties: [FGKPropertyDescriptor] = [],
+                target: FGKEventTarget? = nil) {
         self.frame = frame
+        self.properties = properties
         self.instrumentId = instrumentId
         self.target = target
     }
@@ -104,6 +140,17 @@ public final class FGKNode {
             return self
         }
         return nil
+    }
+
+    /// Apply a property change to this node's target when supported.
+    ///
+    /// This is the local counterpart to CI/PE SET operations in a MIDI 2.0
+    /// environment; consumers can bridge CI/PE payloads into calls here.
+    @discardableResult
+    public func setProperty(_ name: String, value: FGKPropertyValue) -> Bool {
+        guard let consumer = target as? FGKPropertyConsumer else { return false }
+        consumer.setProperty(name, value: value)
+        return true
     }
 }
 

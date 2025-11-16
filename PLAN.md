@@ -82,7 +82,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 - `AGENTS.md` documents the CI/PE mapping contract and any limitations.
 
 **Status**
-- TODO: MIDI 2.0 integration is design‑only; FountainGUIKit currently only defines event and node primitives.
+- DONE (FountainGUIKit layer): nodes expose a property schema (`[FGKPropertyDescriptor]`), a canonical value type (`FGKPropertyValue`), and a local setter (`setProperty(_ name:value:)`) that forwards to `FGKPropertyConsumer` targets. Concrete CI/PE ↔ property mapping remains in FountainKit, using these types as the application‑level contract.
 
 ### M5 — Consumers, docs, and stability
 
@@ -134,8 +134,9 @@ Use this section as a quick checklist when starting a new implementation session
 - [ ] M3 MetalViewKit adapter designed and implemented.
 - [x] M3 MetalViewKit adapter designed and implemented.
 - [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
-- [ ] M4 MIDI 2.0 CI/PE integration for instrument nodes.
-- [ ] M4 CI/PE behaviour documented and testable.
+- [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
+- [x] M4 MIDI 2.0 CI/PE integration for instrument nodes.
+- [x] M4 CI/PE behaviour documented and testable.
 - [ ] M5 at least one app consuming FountainGUIKit.
 - [ ] M5 docs and API surface stabilised.
 - [ ] M6 local FountainGUIKit tests cover event routing and layout.

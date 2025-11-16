@@ -30,9 +30,10 @@ Public surface (initial draft, kept tiny and stable):
   - Used by nodes to implement a Cocoa‑style responder chain without touching `NSResponder`.
 - `FGKNode`
   - Pure‑Swift tree node (no NSView base class).
-  - Holds `parent`, `children`, an optional `frame` in the root view’s coordinate space, optional `instrumentId` (future MIDI2/CI identity), and a weak `FGKEventTarget`.
+  - Holds `parent`, `children`, an optional `frame` in the root view’s coordinate space, optional `instrumentId` (future MIDI2/CI identity), a local property schema (`[FGKPropertyDescriptor]`), and a weak `FGKEventTarget`.
   - Implements `bubble(event:)` to walk `self → parent → …` until a target handles the event (event bubbling model, as described in the MetalViewKit demo docs).
   - Provides `hitTest(_:)` to find the deepest node whose frame contains a given point (children are traversed in reverse order so later‑added nodes are considered frontmost).
+  - Provides `setProperty(_ name:value:)` as a local counterpart to CI/PE SET, forwarding to a target that conforms to `FGKPropertyConsumer`.
 - `FGKRootView: NSView`
   - The only AppKit entry point.
   - Owns a `rootNode: FGKNode` and forwards `keyDown`, `keyUp`, `mouseDown`, `mouseUp`, `mouseMoved` as `FGKEvent` into the node graph.

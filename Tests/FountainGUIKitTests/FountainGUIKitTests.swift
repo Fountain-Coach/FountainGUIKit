@@ -28,6 +28,24 @@ private final class RecordingSink: FGKInstrumentSink {
     }
 }
 
+private final class PropertyRecordingTarget: FGKEventTarget, FGKPropertyConsumer {
+    struct Entry {
+        let name: String
+        let value: FGKPropertyValue
+    }
+    var events: [FGKEvent] = []
+    var properties: [Entry] = []
+
+    func handle(event: FGKEvent) -> Bool {
+        events.append(event)
+        return false
+    }
+
+    func setProperty(_ name: String, value: FGKPropertyValue) {
+        properties.append(.init(name: name, value: value))
+    }
+}
+
 @Test
 func node_bubble_stops_at_first_handler() {
     let root = FGKNode()
@@ -235,4 +253,23 @@ func instrumentAdapter_forwards_events_to_sink() {
     #expect(sink.entries[1].topic == "fgk.mouseDown")
     #expect(sink.entries[0].data is FGKKeyEvent)
     #expect(sink.entries[1].data is FGKMouseEvent)
+}
+
+@Test
+func node_setProperty_forwards_to_consumer() {
+    let target = PropertyRecordingTarget()
+    let node = FGKNode(
+        instrumentId: "test.instrument",
+        frame: NSRect(x: 0, y: 0, width: 10, height: 10),
+        properties: [
+            FGKPropertyDescriptor(name: "gain", kind: .float(min: 0.0, max: 1.0, default: 0.5))
+        ],
+        target: target
+    )
+
+    let result = node.setProperty("gain", value: .float(0.75))
+    #expect(result)
+    #expect(target.properties.count == 1)
+    #expect(target.properties[0].name == "gain")
+    #expect(target.properties[0].value == .float(0.75))
 }
