@@ -140,5 +140,5 @@ The goal is that from the first milestone, FountainGUIKit surfaces are determini
 
 ## Next steps
 
-- Extend this document with the initial MetalViewKit adapter design (specific renderer hooks, property naming, MIDI 2.0 mapping) before adding any dependencies.
-- Add a `README.md` that points to this file as the canonical design reference and shows minimal NSView integration examples for host apps.
+- Document concrete MetalViewKit adapter patterns (renderer hooks, property naming, MIDI 2.0 mapping) as they are implemented in consuming apps.
+- Keep `PLAN.md` and `README.md` in sync with this file whenever the public API surface changes.

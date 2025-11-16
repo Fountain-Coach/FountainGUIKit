@@ -116,7 +116,7 @@ The framework is designed to integrate with FountainKit’s test infrastructure:
   - `FountainGUIKitTests` focuses on:
     - mapping `NSEvent` to `FGKEvent` in `FGKRootView`,
     - event bubbling behaviour in `FGKNode`,
-    - and (once added) layout and hit‑testing.
+    - and layout and hit‑testing.
 
 - **MRTS (MIDI Robot Test Script) readiness**
   - Nodes can carry an `instrumentId` aligned with the identities used by FountainKit’s MIDI 2.0 instrument host.

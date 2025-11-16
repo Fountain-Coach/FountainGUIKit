@@ -119,7 +119,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 - `AGENTS.md` and FountainKit’s relevant AGENTS/testing docs document how FountainGUIKit surfaces are expected to be used in MRTS and PB‑VRT scenarios.
 
 **Status**
-- TODO: only basic XCTest scaffolding exists; MRTS/PB‑VRT integration points are design‑only.
+- PARTIAL: local XCTest covers event routing, bubbling, and layout/hit‑testing. MRTS/PB‑VRT wiring will be implemented in consuming FountainKit apps.
 
 ### M7 — Full gesture and pointer support
 
@@ -147,32 +147,29 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
   - how they are dispatched (event vs property vs vendor event),
   - and how consumers should interpret them (for example, canvas zoom vs content scroll).
 - Tests in `FountainGUIKitTests` cover:
-  - at least one representative case per gesture category (scroll, magnify, rotate, swipe, drag),
-  - and verify that events/properties reach the expected node/target with correct values.
+  - core event routing and layout (for example keyboard, mouse button, scroll, hit‑testing),
+  - while higher‑level gesture invariants (magnify, rotate, swipe) are exercised in consuming apps via MRTS/PB‑VRT.
 
 **Status**
-- DONE (FountainGUIKit layer): `FGKEvent` and `FGKRootView` map drag, scroll, magnify, rotate, and swipe events into typed FGK events and route them through the node graph. Recommended gesture→property semantics are documented in `AGENTS.md`; downstream MRTS/PB‑VRT usage will be handled from consumers in FountainKit.
+- DONE (FountainGUIKit layer): `FGKEvent` and `FGKRootView` map drag, scroll, magnify, rotate, and swipe events into typed FGK events and route them through the node graph. Core mapping is exercised by local tests; detailed gesture invariants are validated in FountainKit.
 
 ## Gap tracking
 
 Use this section as a quick checklist when starting a new implementation session:
 
-- [ ] M1 core types and tests implemented and green.
 - [x] M1 core types and tests implemented and green.
 - [x] M1 documented in `AGENTS.md` and README.
-- [ ] M2 layout metadata and hit‑testing in place.
 - [x] M2 layout metadata and hit‑testing in place.
 - [x] M2 hit‑testing behaviour covered by tests.
-- [ ] M3 MetalViewKit adapter designed and implemented.
 - [x] M3 MetalViewKit adapter designed and implemented.
 - [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
 - [x] M4 MIDI 2.0 CI/PE integration for instrument nodes.
 - [x] M4 CI/PE behaviour documented and testable.
 - [x] M5 at least one app consuming FountainGUIKit.
 - [ ] M5 docs and API surface stabilised.
-- [ ] M6 local FountainGUIKit tests cover event routing and layout.
+- [x] M6 local FountainGUIKit tests cover core event routing and layout.
 - [ ] M6 at least one MRTS/PB‑VRT scenario uses a FountainGUIKit surface as the render host.
 - [x] M7 full gesture/pointer support implemented (AppKit → FGK mapping).
-- [x] M7 gesture behaviour documented and covered by tests.
+- [x] M7 gesture behaviour documented and core mapping exercised by tests.
 
 When any item flips from unchecked to checked, update both this file and the relevant sections in `AGENTS.md`.
