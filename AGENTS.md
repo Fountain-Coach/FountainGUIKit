@@ -8,6 +8,7 @@ This repository hosts **FountainGUIKit**, a reusable GUI framework built on top 
 - Provides an **NSView‑only** host (`FGKRootView`) plus a pure‑Swift scene graph (`FGKNode`) and event model (`FGKEvent`).
 - Is independent of SwiftUI: apps may wrap `FGKRootView` in SwiftUI if they choose, but no SwiftUI symbols live in this package.
 - Is independent of AppKit’s responder chain semantics: events are routed through FountainGUIKit’s own node graph, not via `NSResponder`.
+- Ships a small demo executable target (`fountain-gui-demo`) that embeds `FGKRootView` in an AppKit window for manual exploration and smoke testing.
 
 MetalViewKit and MIDI 2.0 are **design anchors**, not hard dependencies yet. As the kit evolves, it will gain adapters that host `MetalViewKit` renderers and speak MIDI 2.0 CI/PE, but the core stays small and AppKit‑only. For background and rationale, see `Doc/Building-a-Custom-GUI-Framework-with-MetalViewKit-and-MIDI2-Integration.md`.
 

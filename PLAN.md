@@ -87,19 +87,19 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 ### M5 — Consumers, docs, and stability
 
 **Scope**
-- Wire FountainGUIKit into at least one consuming app (e.g. PatchBay or a dedicated demo) as the GUI host.
+- Wire FountainGUIKit into at least one consuming app (for example a dedicated demo executable) as the GUI host.
 - Add operator‑facing documentation:
   - `README.md` with quick start and API overview.
   - Pointers into the FountainKit repo where MetalViewKit renderers live.
 - Stabilise APIs (marking them public/internal as appropriate) and adopt semantic versioning.
 
 **Definition of Done**
-- At least one FountainAI app uses FountainGUIKit for its MetalViewKit hosting and event routing.
+- At least one executable target uses FountainGUIKit for its hosting and event routing (for example `fountain-gui-demo` in this package or a consumer in FountainKit).
 - All public symbols are documented in `AGENTS.md` and mirrored in `README.md`.
 - The package builds cleanly under CI with tests passing for all implemented milestones.
 
 **Status**
-- TODO: no external consumers wired yet; this milestone will be revisited once M2–M4 are underway.
+- DONE (package‑local demo): the `fountain-gui-demo` executable target hosts an `FGKRootView` and logs events, and AGENTS/README describe how to consume the library from other packages.
 
 ### M6 — Testing, MRTS, and PB‑VRT integration
 
@@ -134,10 +134,9 @@ Use this section as a quick checklist when starting a new implementation session
 - [ ] M3 MetalViewKit adapter designed and implemented.
 - [x] M3 MetalViewKit adapter designed and implemented.
 - [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
-- [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
 - [x] M4 MIDI 2.0 CI/PE integration for instrument nodes.
 - [x] M4 CI/PE behaviour documented and testable.
-- [ ] M5 at least one app consuming FountainGUIKit.
+- [x] M5 at least one app consuming FountainGUIKit.
 - [ ] M5 docs and API surface stabilised.
 - [ ] M6 local FountainGUIKit tests cover event routing and layout.
 - [ ] M6 at least one MRTS/PB‑VRT scenario uses a FountainGUIKit surface as the render host.

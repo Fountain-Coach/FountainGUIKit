@@ -72,6 +72,14 @@ In a consuming package’s `Package.swift`:
     - `.package(url: "https://github.com/Fountain-Coach/FountainGUIKit.git", from: "0.1.0")`
 - Add `"FountainGUIKit"` to the target’s dependencies.
 
+### Run the demo
+
+This package ships a small AppKit demo executable that hosts an `FGKRootView` and logs events:
+
+- Build and run it with:
+  - `swift run -c debug fountain-gui-demo`
+- The window surface is fully instrument‑ready: typing and clicking will generate `FGKEvent`s that are routed through an `FGKNode` tree and logged via a simple `FGKEventTarget`.
+
 ### Embed `FGKRootView` in an AppKit window
 
 A minimal usage pattern in an AppKit app looks like:

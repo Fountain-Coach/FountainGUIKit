@@ -12,12 +12,20 @@ let package = Package(
         .library(
             name: "FountainGUIKit",
             targets: ["FountainGUIKit"]
+        ),
+        .executable(
+            name: "fountain-gui-demo",
+            targets: ["fountain-gui-demo"]
         )
     ],
     targets: [
         .target(
             name: "FountainGUIKit",
             dependencies: []
+        ),
+        .executableTarget(
+            name: "fountain-gui-demo",
+            dependencies: ["FountainGUIKit"]
         ),
         .testTarget(
             name: "FountainGUIKitTests",
