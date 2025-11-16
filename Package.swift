@@ -16,7 +16,7 @@ let package = Package(
         .executable(
             name: "fountain-gui-demo",
             targets: ["fountain-gui-demo"]
-        )
+        ),
     ],
     targets: [
         .target(
