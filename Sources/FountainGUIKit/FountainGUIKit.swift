@@ -47,13 +47,17 @@ public final class FGKNode {
     public weak var parent: FGKNode?
     public var children: [FGKNode] = []
 
+    /// Optional frame for this node in the root view's coordinate space.
+    public var frame: NSRect
+
     /// Optional instrument identity (e.g. MIDI 2.0 instrument id).
     public var instrumentId: String?
 
     /// Event sink for this node.
     public weak var target: FGKEventTarget?
 
-    public init(instrumentId: String? = nil, target: FGKEventTarget? = nil) {
+    public init(instrumentId: String? = nil, frame: NSRect = .zero, target: FGKEventTarget? = nil) {
+        self.frame = frame
         self.instrumentId = instrumentId
         self.target = target
     }
@@ -74,6 +78,23 @@ public final class FGKNode {
             node = current.parent
         }
         return false
+    }
+
+    /// Perform a hit test starting from this node.
+    ///
+    /// Traverses children in reverse order (last added considered frontmost) and
+    /// returns the deepest node whose frame contains the given point. Returns
+    /// nil when no node claims the point.
+    public func hitTest(_ point: NSPoint) -> FGKNode? {
+        for child in children.reversed() {
+            if let hit = child.hitTest(point) {
+                return hit
+            }
+        }
+        if frame.contains(point) {
+            return self
+        }
+        return nil
     }
 }
 
@@ -128,7 +149,8 @@ open class FGKRootView: NSView {
             buttonNumber: Int(event.buttonNumber),
             modifiers: event.modifierFlags
         )
-        _ = rootNode.bubble(event: .mouseDown(e))
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .mouseDown(e))
     }
 
     open override func mouseUp(with event: NSEvent) {
@@ -138,7 +160,8 @@ open class FGKRootView: NSView {
             buttonNumber: Int(event.buttonNumber),
             modifiers: event.modifierFlags
         )
-        _ = rootNode.bubble(event: .mouseUp(e))
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .mouseUp(e))
     }
 
     open override func mouseMoved(with event: NSEvent) {
@@ -148,6 +171,7 @@ open class FGKRootView: NSView {
             buttonNumber: Int(event.buttonNumber),
             modifiers: event.modifierFlags
         )
-        _ = rootNode.bubble(event: .mouseMoved(e))
+        let targetNode = rootNode.hitTest(p) ?? rootNode
+        _ = targetNode.bubble(event: .mouseMoved(e))
     }
 }

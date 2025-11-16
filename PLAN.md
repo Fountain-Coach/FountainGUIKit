@@ -46,7 +46,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 - `AGENTS.md` and `PLAN.md` document how hit‑testing interacts with event bubbling.
 
 **Status**
-- TODO: no layout or hit‑testing exists yet; everything routes through a single root node.
+- DONE: `FGKNode` exposes a frame and `hitTest(_:)`, tests cover hit‑testing and mouse dispatch, and AGENTS/PLAN document the behaviour.
 
 ### M3 — MetalViewKit adapter
 
@@ -129,7 +129,8 @@ Use this section as a quick checklist when starting a new implementation session
 - [x] M1 core types and tests implemented and green.
 - [x] M1 documented in `AGENTS.md` and README.
 - [ ] M2 layout metadata and hit‑testing in place.
-- [ ] M2 hit‑testing behaviour covered by tests.
+- [x] M2 layout metadata and hit‑testing in place.
+- [x] M2 hit‑testing behaviour covered by tests.
 - [ ] M3 MetalViewKit adapter designed and implemented.
 - [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
 - [ ] M4 MIDI 2.0 CI/PE integration for instrument nodes.

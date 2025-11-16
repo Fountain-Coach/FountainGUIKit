@@ -91,32 +91,113 @@ func rootView_maps_keyDown_to_FGKEvent() {
 @MainActor
 @Test
 func rootView_maps_mouseDown_location() {
-    let target = RecordingTarget(handleResult: true)
-    let rootNode = FGKNode(target: target)
+    let rootTarget = RecordingTarget(handleResult: true)
+    let rootNode = FGKNode(target: rootTarget)
+
+    let leftTarget = RecordingTarget(handleResult: true)
+    let rightTarget = RecordingTarget(handleResult: true)
+
+    let left = FGKNode(frame: NSRect(x: 0, y: 0, width: 100, height: 200), target: leftTarget)
+    let right = FGKNode(frame: NSRect(x: 100, y: 0, width: 100, height: 200), target: rightTarget)
+    rootNode.addChild(left)
+    rootNode.addChild(right)
+
     let view = FGKRootView(frame: NSRect(x: 0, y: 0, width: 200, height: 200), rootNode: rootNode)
 
-    let clickPoint = NSPoint(x: 42, y: 24)
-    let maybeEvent = NSEvent.mouseEvent(
-        with: .leftMouseDown,
-        location: clickPoint,
-        modifierFlags: [],
-        timestamp: 0,
-        windowNumber: 0,
-        context: nil,
-        eventNumber: 1,
-        clickCount: 1,
-        pressure: 0
-    )
-    #expect(maybeEvent != nil)
-    guard let event = maybeEvent else { return }
+    // Click in left child
+    do {
+        let clickPoint = NSPoint(x: 42, y: 24)
+        let maybeEvent = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: clickPoint,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            eventNumber: 1,
+            clickCount: 1,
+            pressure: 0
+        )
+        #expect(maybeEvent != nil)
+        guard let event = maybeEvent else { return }
 
-    view.mouseDown(with: event)
+        view.mouseDown(with: event)
 
-    #expect(target.events.count == 1)
-    if case let .mouseDown(mouseEvent) = target.events[0] {
-        #expect(mouseEvent.locationInView.x == clickPoint.x)
-        #expect(mouseEvent.locationInView.y == clickPoint.y)
-    } else {
-        #expect(Bool(false), "Expected mouseDown event")
+        #expect(leftTarget.events.count == 1)
+        #expect(rightTarget.events.isEmpty)
+        #expect(rootTarget.events.isEmpty)
+        if case let .mouseDown(mouseEvent) = leftTarget.events[0] {
+            #expect(mouseEvent.locationInView.x == clickPoint.x)
+            #expect(mouseEvent.locationInView.y == clickPoint.y)
+        } else {
+            #expect(Bool(false), "Expected mouseDown event")
+        }
     }
+
+    // Click in right child
+    do {
+        let clickPoint = NSPoint(x: 150, y: 50)
+        let maybeEvent = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: clickPoint,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            eventNumber: 2,
+            clickCount: 1,
+            pressure: 0
+        )
+        #expect(maybeEvent != nil)
+        guard let event = maybeEvent else { return }
+
+        view.mouseDown(with: event)
+
+        #expect(leftTarget.events.count == 1)
+        #expect(rightTarget.events.count == 1)
+        #expect(rootTarget.events.isEmpty)
+    }
+
+    // Click outside children, should fall back to root
+    do {
+        let clickPoint = NSPoint(x: 250, y: 10)
+        let maybeEvent = NSEvent.mouseEvent(
+            with: .leftMouseDown,
+            location: clickPoint,
+            modifierFlags: [],
+            timestamp: 0,
+            windowNumber: 0,
+            context: nil,
+            eventNumber: 3,
+            clickCount: 1,
+            pressure: 0
+        )
+        #expect(maybeEvent != nil)
+        guard let event = maybeEvent else { return }
+
+        view.mouseDown(with: event)
+
+        #expect(rootTarget.events.count == 1)
+    }
+}
+
+@Test
+func node_hitTest_prefers_deepest_child() {
+    let root = FGKNode(frame: NSRect(x: 0, y: 0, width: 200, height: 200))
+    let parent = FGKNode(frame: NSRect(x: 20, y: 20, width: 160, height: 160))
+    let child = FGKNode(frame: NSRect(x: 40, y: 40, width: 40, height: 40))
+    root.addChild(parent)
+    parent.addChild(child)
+
+    let pointInsideAll = NSPoint(x: 50, y: 50)
+    let hit = root.hitTest(pointInsideAll)
+    #expect(hit === child)
+
+    let pointInsideParentOnly = NSPoint(x: 25, y: 25)
+    let hit2 = root.hitTest(pointInsideParentOnly)
+    #expect(hit2 === parent)
+
+    let outside = NSPoint(x: 500, y: 500)
+    let hit3 = root.hitTest(outside)
+    #expect(hit3 == nil)
 }

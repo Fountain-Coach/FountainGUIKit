@@ -30,11 +30,13 @@ Public surface (initial draft, kept tiny and stable):
   - Used by nodes to implement a Cocoa‑style responder chain without touching `NSResponder`.
 - `FGKNode`
   - Pure‑Swift tree node (no NSView base class).
-  - Holds `parent`, `children`, optional `instrumentId` (future MIDI2/CI identity) and a weak `FGKEventTarget`.
+  - Holds `parent`, `children`, an optional `frame` in the root view’s coordinate space, optional `instrumentId` (future MIDI2/CI identity), and a weak `FGKEventTarget`.
   - Implements `bubble(event:)` to walk `self → parent → …` until a target handles the event (event bubbling model, as described in the MetalViewKit demo docs).
+  - Provides `hitTest(_:)` to find the deepest node whose frame contains a given point (children are traversed in reverse order so later‑added nodes are considered frontmost).
 - `FGKRootView: NSView`
   - The only AppKit entry point.
   - Owns a `rootNode: FGKNode` and forwards `keyDown`, `keyUp`, `mouseDown`, `mouseUp`, `mouseMoved` as `FGKEvent` into the node graph.
+  - For pointer events, uses `rootNode.hitTest(_:)` to choose an initial target node before bubbling; if no node claims the point, events bubble from `rootNode`.
   - Always accepts first responder; apps control focus and wiring by choosing which node’s target consumes events.
 
 Future layers (to be designed here before code is added):
@@ -42,8 +44,6 @@ Future layers (to be designed here before code is added):
 - MetalViewKit adapters:
   - A small bridge that binds a `MetalSceneRenderer` to a `FGKNode` (event sink + property schema) without introducing SwiftUI.
   - Optional MIDI 2.0 adapter that exposes a node’s properties via CI/PE and consumes UMP from loopback/RTP transports.
-- Layout and hit‑testing:
-  - Lightweight layout metadata on `FGKNode` (frames in canvas/document space) plus a deterministic hit‑testing algorithm to choose the initial target for mouse events before bubbling.
 
 ## Testing, MRTS, and PB‑VRT
 
