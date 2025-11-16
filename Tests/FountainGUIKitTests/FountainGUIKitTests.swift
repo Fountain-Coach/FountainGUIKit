@@ -2,6 +2,7 @@ import AppKit
 import Testing
 @testable import FountainGUIKit
 
+@MainActor
 private final class RecordingTarget: FGKEventTarget {
     var events: [FGKEvent] = []
     var handleResult: Bool
@@ -36,6 +37,7 @@ private final class PropertyRecordingTarget: FGKEventTarget, FGKPropertyConsumer
     var events: [FGKEvent] = []
     var properties: [Entry] = []
 
+    @MainActor
     func handle(event: FGKEvent) -> Bool {
         events.append(event)
         return false
@@ -46,6 +48,7 @@ private final class PropertyRecordingTarget: FGKEventTarget, FGKPropertyConsumer
     }
 }
 
+@MainActor
 @Test
 func node_bubble_stops_at_first_handler() {
     let root = FGKNode()
@@ -65,6 +68,7 @@ func node_bubble_stops_at_first_handler() {
     #expect(rootTarget.events.isEmpty)
 }
 
+@MainActor
 @Test
 func node_bubble_falls_back_to_parent() {
     let root = FGKNode()
@@ -211,6 +215,7 @@ func rootView_maps_mouseDown_location() {
     }
 }
 
+@MainActor
 @Test
 func node_hitTest_prefers_deepest_child() {
     let root = FGKNode(frame: NSRect(x: 0, y: 0, width: 200, height: 200))
@@ -232,6 +237,7 @@ func node_hitTest_prefers_deepest_child() {
     #expect(hit3 == nil)
 }
 
+@MainActor
 @Test
 func instrumentAdapter_forwards_events_to_sink() {
     let sink = RecordingSink()
@@ -255,6 +261,7 @@ func instrumentAdapter_forwards_events_to_sink() {
     #expect(sink.entries[1].data is FGKMouseEvent)
 }
 
+@MainActor
 @Test
 func node_setProperty_forwards_to_consumer() {
     let target = PropertyRecordingTarget()

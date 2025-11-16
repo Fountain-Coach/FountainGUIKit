@@ -128,6 +128,24 @@ FountainGUIKit itself remains a small library, but it is designed to plug into F
 
 The goal is that from the first milestone, FountainGUIKit surfaces are deterministic and easy to drive from MRTS and PB‑VRT harnesses, even though the orchestration lives in FountainKit.
 
+## Swift 6 concurrency model
+
+FountainGUIKit is designed to be safe under Swift 6’s strict concurrency checker:
+
+- `FGKRootView` is `@MainActor`.
+  - All AppKit event entry points (`keyDown`, `mouseDown`, `scrollWheel`, `magnify`, `rotate`, `swipe`, etc.) are main‑actor isolated.
+- Event routing is main‑actor aware:
+  - `FGKEventTarget` is `@MainActor`; conformers are expected to run on the main actor and may freely mutate UI state.
+  - `FGKNode`’s event helpers (`bubble(event:)`, `hitTest(_:)`) are `@MainActor`, matching their use in UI event dispatch.
+  - `FGKPropertyConsumer` is also `@MainActor`; property application for GUI instruments happens on the main actor to avoid races with NSView state.
+- Non‑UI work (for example MIDI 2.0 CI/PE, background computation) should live in separate, non‑UI types.
+  - Event targets and property consumers can forward events to background workers, but UI mutation must remain on the main actor.
+
+Consumer guidance:
+
+- Conform UI‑bound types (views, controllers) to `FGKEventTarget`/`FGKPropertyConsumer` and implement `handle(event:)`/`setProperty` as normal methods; the main‑actor isolation is inherited from the protocols.
+- For non‑UI targets, add explicit hops (for example `Task { @MainActor in … }`) before touching NSView or other UI state.
+
 ## Source of truth and planning policy
 
 - **AGENTS‑first**: any new concept (event type, node field, adapter, transport) is documented here before it appears in code.

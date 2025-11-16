@@ -39,6 +39,7 @@ public struct FGKMouseEvent {
 }
 
 /// Basic event target for the custom responder chain.
+@MainActor
 public protocol FGKEventTarget: AnyObject {
     /// Handle an event. Return true if the event was consumed.
     func handle(event: FGKEvent) -> Bool
@@ -69,6 +70,7 @@ public struct FGKPropertyDescriptor: Equatable {
 }
 
 /// Target that can apply property changes by name.
+@MainActor
 public protocol FGKPropertyConsumer: AnyObject {
     func setProperty(_ name: String, value: FGKPropertyValue)
 }
@@ -142,6 +144,7 @@ public struct FGKSwipeEvent {
 ///
 /// This is separate from NSView so that event routing and instrument identity
 /// remain independent from AppKit's responder chain.
+@MainActor
 public final class FGKNode {
     public weak var parent: FGKNode?
     public var children: [FGKNode] = []
@@ -219,6 +222,7 @@ public final class FGKNode {
 ///
 /// This is the glue between the FGK node graph and an underlying renderer or
 /// instrument implementation (for example a MetalViewKit scene renderer).
+@MainActor
 public final class FGKInstrumentAdapter: FGKEventTarget {
     public weak var sink: FGKInstrumentSink?
 
@@ -282,6 +286,7 @@ public extension FGKNode {
 /// Apps embed this view in their own windowing system. Internally we map
 /// NSEvent instances into FGKEvent values and dispatch via the FGKNode tree
 /// instead of using AppKit's responder chain.
+@MainActor
 open class FGKRootView: NSView {
     public let rootNode: FGKNode
 

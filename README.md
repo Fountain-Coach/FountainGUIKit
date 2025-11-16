@@ -9,6 +9,7 @@ This repository follows an **agent‑driven design**: `AGENTS.md` is the primary
 - **NSView‑only host**
   - `FGKRootView: NSView` is the single entry point. It receives `NSEvent`s and forwards them into a framework‑owned event system instead of using AppKit’s responder chain.
   - The package does not expose any SwiftUI types; apps can wrap `FGKRootView` in SwiftUI themselves if desired.
+  - `FGKRootView`, `FGKEventTarget`, and `FGKPropertyConsumer` are main‑actor aware so UI code remains Swift 6 concurrency safe by default.
 
 - **Explicit event model**
   - `FGKEvent`, `FGKKeyEvent`, `FGKMouseEvent` capture keyboard and mouse input as simple Swift types.
