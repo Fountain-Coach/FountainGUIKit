@@ -16,6 +16,18 @@ private final class RecordingTarget: FGKEventTarget {
     }
 }
 
+private final class RecordingSink: FGKInstrumentSink {
+    struct Entry {
+        let topic: String
+        let data: Any?
+    }
+    var entries: [Entry] = []
+
+    func vendorEvent(topic: String, data: Any?) {
+        entries.append(.init(topic: topic, data: data))
+    }
+}
+
 @Test
 func node_bubble_stops_at_first_handler() {
     let root = FGKNode()
@@ -200,4 +212,27 @@ func node_hitTest_prefers_deepest_child() {
     let outside = NSPoint(x: 500, y: 500)
     let hit3 = root.hitTest(outside)
     #expect(hit3 == nil)
+}
+
+@Test
+func instrumentAdapter_forwards_events_to_sink() {
+    let sink = RecordingSink()
+    let node = FGKNode(frame: NSRect(x: 0, y: 0, width: 100, height: 100))
+    let adapter = node.attachInstrument(sink: sink)
+
+    // keyDown
+    let keyEvent = FGKKeyEvent(characters: "a", keyCode: 0, modifiers: [])
+    let handledKey = adapter.handle(event: .keyDown(keyEvent))
+    #expect(handledKey)
+
+    // mouseDown
+    let mouseEvent = FGKMouseEvent(locationInView: NSPoint(x: 10, y: 20), buttonNumber: 0, modifiers: [])
+    let handledMouse = adapter.handle(event: .mouseDown(mouseEvent))
+    #expect(handledMouse)
+
+    #expect(sink.entries.count == 2)
+    #expect(sink.entries[0].topic == "fgk.keyDown")
+    #expect(sink.entries[1].topic == "fgk.mouseDown")
+    #expect(sink.entries[0].data is FGKKeyEvent)
+    #expect(sink.entries[1].data is FGKMouseEvent)
 }

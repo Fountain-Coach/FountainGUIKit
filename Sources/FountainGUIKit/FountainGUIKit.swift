@@ -39,6 +39,15 @@ public protocol FGKEventTarget: AnyObject {
     func handle(event: FGKEvent) -> Bool
 }
 
+/// Minimal instrument sink interface compatible with MetalViewKit renderers.
+///
+/// Types such as `MetalSceneRenderer` can conform to this protocol in consumers
+/// so that FountainGUIKit can forward higher‑level events without depending on
+/// MetalViewKit directly.
+public protocol FGKInstrumentSink: AnyObject {
+    func vendorEvent(topic: String, data: Any?)
+}
+
 /// Node in the FountainGUIKit view hierarchy.
 ///
 /// This is separate from NSView so that event routing and instrument identity
@@ -95,6 +104,53 @@ public final class FGKNode {
             return self
         }
         return nil
+    }
+}
+
+/// Default event target that forwards FGK events to an instrument sink.
+///
+/// This is the glue between the FGK node graph and an underlying renderer or
+/// instrument implementation (for example a MetalViewKit scene renderer).
+public final class FGKInstrumentAdapter: FGKEventTarget {
+    public weak var sink: FGKInstrumentSink?
+
+    public init(sink: FGKInstrumentSink?) {
+        self.sink = sink
+    }
+
+    public func handle(event: FGKEvent) -> Bool {
+        guard let sink else { return false }
+        switch event {
+        case .keyDown(let key):
+            sink.vendorEvent(topic: "fgk.keyDown", data: key)
+            return true
+        case .keyUp(let key):
+            sink.vendorEvent(topic: "fgk.keyUp", data: key)
+            return true
+        case .mouseDown(let mouse):
+            sink.vendorEvent(topic: "fgk.mouseDown", data: mouse)
+            return true
+        case .mouseUp(let mouse):
+            sink.vendorEvent(topic: "fgk.mouseUp", data: mouse)
+            return true
+        case .mouseMoved(let mouse):
+            sink.vendorEvent(topic: "fgk.mouseMoved", data: mouse)
+            return true
+        }
+    }
+}
+
+public extension FGKNode {
+    /// Attach an instrument sink to this node via a default adapter.
+    ///
+    /// The adapter becomes this node's event target and forwards FGK events
+    /// as vendor events to the sink. Consumers can use this with a conforming
+    /// MetalViewKit renderer to bind UI events to instrument behaviour.
+    @discardableResult
+    func attachInstrument(sink: FGKInstrumentSink?) -> FGKInstrumentAdapter {
+        let adapter = FGKInstrumentAdapter(sink: sink)
+        self.target = adapter
+        return adapter
     }
 }
 

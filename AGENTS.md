@@ -42,7 +42,11 @@ Public surface (initial draft, kept tiny and stable):
 Future layers (to be designed here before code is added):
 
 - MetalViewKit adapters:
-  - A small bridge that binds a `MetalSceneRenderer` to a `FGKNode` (event sink + property schema) without introducing SwiftUI.
+  - A small bridge that binds a `MetalSceneRenderer`‑like instrument sink to a `FGKNode` (event sink + property schema) without introducing SwiftUI.
+  - At the FountainGUIKit layer this is expressed as:
+    - `FGKInstrumentSink` — a minimal protocol with `vendorEvent(topic:data:)` that MetalViewKit renderers can conform to in consumers.
+    - `FGKInstrumentAdapter` — an `FGKEventTarget` that forwards FGK events to an instrument sink using well‑known topics (for example `fgk.keyDown`, `fgk.mouseDown`) and typed payloads (`FGKKeyEvent`, `FGKMouseEvent`).
+    - `FGKNode.attachInstrument(sink:)` — convenience to attach an adapter as a node’s target.
   - Optional MIDI 2.0 adapter that exposes a node’s properties via CI/PE and consumes UMP from loopback/RTP transports.
 
 ## Testing, MRTS, and PB‑VRT

@@ -62,7 +62,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 - Example code (in README or tests) shows a minimal triangle/quad scene hosted via FountainGUIKit.
 
 **Status**
-- TODO: no MetalViewKit integration in this package yet; all references live only in design docs.
+- DONE (FountainGUIKit layer): the package defines `FGKInstrumentSink`, `FGKInstrumentAdapter`, and `FGKNode.attachInstrument(sink:)` so that MetalViewKit renderers can integrate from consuming packages. Concrete MetalViewKit wiring remains in FountainKit.
 
 ### M4 — MIDI 2.0 CI/PE integration
 
@@ -132,6 +132,7 @@ Use this section as a quick checklist when starting a new implementation session
 - [x] M2 layout metadata and hit‑testing in place.
 - [x] M2 hit‑testing behaviour covered by tests.
 - [ ] M3 MetalViewKit adapter designed and implemented.
+- [x] M3 MetalViewKit adapter designed and implemented.
 - [ ] M3 example code demonstrating hosting of a MetalViewKit scene via FountainGUIKit.
 - [ ] M4 MIDI 2.0 CI/PE integration for instrument nodes.
 - [ ] M4 CI/PE behaviour documented and testable.
