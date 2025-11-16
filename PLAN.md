@@ -29,7 +29,7 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 - `AGENTS.md` accurately documents the public API surface and event flow.
 
 **Status**
-- IN PROGRESS: core types exist and compile; tests and docs still need to be fleshed out.
+- DONE: core types exist, tests cover bubbling and event mapping, and AGENTS/README are aligned.
 
 ### M2 — Layout and hit‑testing
 
@@ -126,7 +126,8 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 Use this section as a quick checklist when starting a new implementation session:
 
 - [ ] M1 core types and tests implemented and green.
-- [ ] M1 documented in `AGENTS.md` and README.
+- [x] M1 core types and tests implemented and green.
+- [x] M1 documented in `AGENTS.md` and README.
 - [ ] M2 layout metadata and hit‑testing in place.
 - [ ] M2 hit‑testing behaviour covered by tests.
 - [ ] M3 MetalViewKit adapter designed and implemented.
