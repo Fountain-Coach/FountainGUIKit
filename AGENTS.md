@@ -19,6 +19,8 @@ MetalViewKit and MIDI 2.0 are **design anchors**, not hard dependencies yet. As
 - **NSView host, not a UI framework**: FountainGUIKit embeds into existing windowing systems via `NSView`, but owns its own hierarchy and event routing.
 - **No CoreMIDI**: any future transport integration uses MIDI 2.0 loopback/RTP/BLE via the existing `MIDI2`/`MIDI2Transports` stack. CoreMIDI is never imported here.
 
+Gestures (trackpad/mouse) are first‑class citizens in this model. The long‑term goal is to cover all AppKit pointer and gesture events (scroll, magnify, rotate, swipes, multi‑button clicks/drags) with explicit mappings into FGK events and/or instrument properties. Users should experience FountainGUIKit‑hosted surfaces as fully interactive, modern macOS views, not as “mouse‑only” legacy widgets.
+
 ## Current API layers
 
 Public surface (initial draft, kept tiny and stable):

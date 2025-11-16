@@ -121,6 +121,38 @@ This plan tracks implementation of FountainGUIKit from the first NSView host to 
 **Status**
 - TODO: only basic XCTest scaffolding exists; MRTS/PB‑VRT integration points are design‑only.
 
+### M7 — Full gesture and pointer support
+
+**Scope**
+- Provide a complete, predictable mapping from AppKit pointer and gesture events into FountainGUIKit’s event and property model, so trackpad/mouse users experience the framework as a first‑class, modern UI surface.
+- Cover, at minimum:
+  - Secondary and other mouse buttons: `rightMouseDown/Up`, `otherMouseDown/Up`, corresponding drag variants.
+  - Dragging: `mouseDragged`, `rightMouseDragged`, `otherMouseDragged`.
+  - Scrolling: `scrollWheel(_:)` with support for high‑resolution deltas and trackpad momentum.
+  - Pinch/zoom: `magnify(with:)`.
+  - Rotation: `rotate(with:)`.
+  - Swipes and gesture lifecycle: `swipe(with:)`, `beginGesture`, `endGesture`.
+- Decide and document how each gesture maps to:
+  - FGK‑level event types (new `FGKEvent` cases and payload structs), and/or
+  - property changes via `FGKNode.setProperty(_ name:value:)` (for example `canvas.zoom`, `canvas.translation.x/y`), and/or
+  - vendor events delivered to `FGKInstrumentSink` for MetalViewKit renderers.
+
+**Definition of Done**
+- `FGKEvent` and its companion structs represent all supported gesture categories with typed payloads.
+- `FGKRootView` overrides the relevant NSView gesture methods and:
+  - maps them into FGK events and/or property changes,
+  - routes them through the node graph using the same hit‑testing and bubbling model as mouse events.
+- `AGENTS.md` clearly documents:
+  - which gestures are supported,
+  - how they are dispatched (event vs property vs vendor event),
+  - and how consumers should interpret them (for example, canvas zoom vs content scroll).
+- Tests in `FountainGUIKitTests` cover:
+  - at least one representative case per gesture category (scroll, magnify, rotate, swipe, drag),
+  - and verify that events/properties reach the expected node/target with correct values.
+
+**Status**
+- TODO: current implementation only handles key events and primary mouse down/up/move; full gesture coverage is design‑only.
+
 ## Gap tracking
 
 Use this section as a quick checklist when starting a new implementation session:
@@ -140,5 +172,7 @@ Use this section as a quick checklist when starting a new implementation session
 - [ ] M5 docs and API surface stabilised.
 - [ ] M6 local FountainGUIKit tests cover event routing and layout.
 - [ ] M6 at least one MRTS/PB‑VRT scenario uses a FountainGUIKit surface as the render host.
+- [ ] M7 full gesture/pointer support implemented (AppKit → FGK mapping).
+- [ ] M7 gesture behaviour documented and covered by tests.
 
 When any item flips from unchecked to checked, update both this file and the relevant sections in `AGENTS.md`.
